@@ -19,20 +19,25 @@ from turtle_chat_widgets import Button , TextInput
 #Make a class called TextBox, which will be a subclass of TextInput.
 class TextBox (TextInput) :
     def draw_box(self):
-        turtle.hideturtle()
-        turtle.penup()
-        turtle.goto(-100,100)
-        turtle.pendown()
-        turtle.goto(100,100)
-        turtle.goto(100,0)
-        turtle.goto(-100,0)
-        turtle.goto(-100,100)
-        turtle.penup()
+        #self.writer.hideturtle()
+        self.writer.penup()
+        self.writer.goto(-100,100)
+        self.writer.pendown()
+        self.writer.goto(100,100)
+        self.writer.goto(100,0)
+        self.writer.goto(-100,0)
+        self.writer.goto(-100,100)
+        self.writer.penup()
+        self.writer.hideturtle()
         
     def write_msg(self):
-        turtle.goto(-20,50)
-        turtle.pendown()
-        turtle.write()
+        self.writer.clear()
+        self.writer.penup()
+        self.writer.goto(-20,45)
+        self.writer.pendown()
+        self.writer.write(self.new_msg)
+        self.writer.penup()
+        
         
         
 

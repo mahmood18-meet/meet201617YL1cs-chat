@@ -1,47 +1,23 @@
 #2016-2017 PERSONAL PROJECTS: TurtleChat!
 #WRITE YOUR NAME HERE!
-#Mahmood
+#MAHMOOD
 #####################################################################################
 #                                   IMPORTS                                         #
 #####################################################################################
 #import the turtle module
 import turtle
 #import the Client class from the turtle_chat_client module
-from turtle_chat_client import Client 
+from turtle_chat_client import Client
 #Finally, from the turtle_chat_widgets module, import two classes: Button and TextInput
-from turtle_chat_widgets import Button , TextInput 
+from turtle_chat_widgets import Button , TextInput
 #####################################################################################
 #####################################################################################
-
+dark_Magic=turtle.Screen()
+dark_Magic.bgpic("/home/student/mahmood/meet201617YL1cs-chat/toto10.gif")
 #####################################################################################
 #                                   TextBox                                         #
 #####################################################################################
 #Make a class called TextBox, which will be a subclass of TextInput.
-class TextBox (TextInput) :
-    def draw_box(self):
-        #self.writer.hideturtle()
-        self.writer.penup()
-        self.writer.goto(-100,100)
-        self.writer.pendown()
-        self.writer.goto(100,100)
-        self.writer.goto(100,0)
-        self.writer.goto(-100,0)
-        self.writer.goto(-100,100)
-        self.writer.penup()
-        self.writer.hideturtle()
-        
-    def write_msg(self):
-        self.writer.clear()
-        self.writer.penup()
-        self.writer.goto(-20,45)
-        self.writer.pendown()
-        self.writer.write(self.new_msg)
-        self.writer.penup()
-        
-        
-        
-
-        #pass
 #Because TextInput is an abstract class, you must implement its abstract
 #methods.  There are two:
 #
@@ -65,7 +41,25 @@ class TextBox (TextInput) :
 #   \r to your string.  Test it out at the Python shell for practice
 #####################################################################################
 #####################################################################################
-
+class TextBox(TextInput):
+    def draw_box(self):
+        turtle.hideturtle()
+        box=turtle.clone()
+        box.penup()
+        box.goto(-self.width/2+self.pos[0],self.pos[1]-self.height/2-50-100)
+        box.pendown()
+        box.hideturtle()
+        box.goto(self.width+-self.width/2+self.pos[0],self.pos[1]-self.height/2-50-100)
+        box.goto(self.width+-self.width/2+self.pos[0],self.pos[1]-self.height/2+self.height-50-100)
+        box.goto(-self.width/2+self.pos[0],self.pos[1]-self.height/2+self.height-50-100)
+        box.goto(-self.width/2+self.pos[0],self.pos[1]-self.height/2-50-100)
+        box.penup()
+        
+    def write_msg(self):
+        self.writer.goto(-80,-130)
+        self.writer.clear()
+        self.writer.write(self.new_msg , font=('Arial',16))
+        
 #####################################################################################
 #                                  SendButton                                       #
 #####################################################################################
@@ -83,8 +77,39 @@ class TextBox (TextInput) :
 #      you send messages and update message displays.
 #####################################################################################
 #####################################################################################
-
-
+class SendButton(Button):
+    def __init__(self,view,my_turtle=None,shape=None,pos=(0,-250)):
+        if my_turtle==None:
+            self.turtle=turtle.clone()
+        else:
+            self.turtle=my_turtle
+        self.turtle.speed(0)
+        self.turtle.hideturtle()
+        self.turtle.penup()
+        self.turtle.goto(pos)
+        screen=turtle.Screen()
+        if shape is None:
+            self.turtle.shape('square')
+            self.turtle.shapesize(2,10)
+        else:
+            turtle.addshape(shape)
+            self.turtle.shape(shape)
+        self.turtle.showturtle()
+        self.turtle.onclick(self.fun) 
+        turtle.listen()
+        self.view=view
+        koko=turtle.clone()
+        self.koko=koko
+        self.koko.penup()
+        self.koko.goto(-37,-265)
+        self.koko.pendown()
+        self.koko.pencolor('white')
+        self.koko.write("SEND", font=('Arial',20))
+    def fun(self,x=0,y=0):
+        self.view.send_msg()
+       
+        
+        
 ##################################################################
 #                             View                               #
 ##################################################################
@@ -108,12 +133,13 @@ class View:
         ###
         #Store the username and partner_name into the instance.
         ###
-
+        self.partner_name=partner_name
+        self.username=username
         ###
         #Make a new client object and store it in this instance of View
         #(i.e. self).  The name of the instance should be my_client
         ###
-
+        turtle.setup(width=300,height=600,startx=None,starty=None)
         ###
         #Set screen dimensions using turtle.setup
         #You can get help on this function, as with other turtle functions,
@@ -124,7 +150,12 @@ class View:
         #
         #at the Python shell.
         ###
-
+        my_client=Client()
+        self.my_client=my_client
+        textbox=TextBox()
+        self.textbox=textbox
+        self.textbox.draw_box()
+        self.button=SendButton(self)
         ###
         #This list will store all of the messages.
         #You can add strings to the front of the list using
@@ -149,7 +180,16 @@ class View:
         #Call your setup_listeners() function, if you have one,
         #and any other remaining setup functions you have invented.
         ###
-
+        self.turtle_queue=[]=list()
+        x=5
+        for i in range (x):
+            self.msg_queue.insert(i," ")
+            self.turtle_queue.append(turtle.clone())
+        for j in range (x):
+            self.turtle_queue[j].hideturtle()
+            self.turtle_queue[j].penup()
+            self.turtle_queue[j].goto(-100,j*20-100)
+            
     def send_msg(self):
         '''
         You should implement this method.  It should call the
@@ -160,6 +200,10 @@ class View:
         It should call self.display_msg() to cause the message
         display to be updated.
         '''
+        self.my_client.send(self.textbox.new_msg)
+        self.msg_queue.insert(0,self.textbox.new_msg)
+        self.display_msg()
+        self.textbox.clear_msg()
         pass
 
     def get_msg(self):
@@ -178,8 +222,8 @@ class View:
 
         Then, it can call turtle.listen()
         '''
-        pass
-
+        turtle.listen()
+           
     def msg_received(self,msg):
         '''
         This method is called when a new message is received.
@@ -190,18 +234,25 @@ class View:
                     - this should be displayed on the screen
         '''
         print(msg) #Debug - print message
-        show_this_msg=self.partner_name+' says:\r'+ msg
+        show_this_msg=self.partner_name+' says:\r \r \r'+ msg
+        self.msg_queue.insert(0,show_this_msg)
+        self.display_msg()
         #Add the message to the queue either using insert (to put at the beginning)
         #or append (to put at the end).
         #
         #Then, call the display_msg method to update the display
-
+        pass
     def display_msg(self):
         '''
         This method should update the messages displayed in the screen.
         You can get the messages you want from self.msg_queue
         '''
-        pass
+        x=5
+        for i in range (x):
+            self.turtle_queue[i].clear()
+        for j in range (x):
+            self.turtle_queue[j].write(self.msg_queue[j], font=('Arial',16))
+
 
     def get_client(self):
         return self.my_client
